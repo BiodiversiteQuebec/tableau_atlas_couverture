@@ -16,44 +16,43 @@ compare_taxa_check <- function(species_list, checklist, col_species, col_check, 
   compared <- character(0)
 
   # Read the CSV files
-  species_list <- read.csv(species_list, stringsAsFactors = FALSE)
-  checklist <- read.csv(checklist, stringsAsFactors = FALSE)
+  obs_list <- read.csv(species_list, stringsAsFactors = FALSE)
+  ref_list <- read.csv(checklist, stringsAsFactors = FALSE)
 
   # Comparison loop
   if (tolower(source) == "canadensys") {
-    for (i in seq_len(nrow(checklist))) {
-      if (checklist[i, "Taxon.Rank"] == 'species') {
-        check <- checklist[i, col_check]
-        for (specie in species_list[, col_species]) {
-          if (tolower(gsub(" ", "", specie)) == tolower(gsub(" ", "", check))) {
-            compared <- c(compared, specie)
-          }
-        }
-      }
-    }
+    overlap <- sum(unique(tolower(gsub(" ", "", ref_list[, col_check]))) %in% unique(tolower(gsub(" ", "", obs_list[, col_species]))), na.rm = TRUE)
+    # for (i in seq_len(nrow(checklist))) {
+    #   if (checklist[i, "Taxon.Rank"] == 'species') {
+    #     check <- checklist[i, col_check]
+    #     for (specie in species_list[, col_species]) {
+    #       if (tolower(gsub(" ", "", specie)) == tolower(gsub(" ", "", check))) {
+    #         compared <- c(compared, specie)
+    #       }
+    #     }
+    #   }
+    # }
   } else if (tolower(source) == "gbif") {
-    for (i in seq_len(nrow(checklist))) {
-      if (checklist[i, "taxonRank"] %in% c('SPECIES', 'VARIETY')) {
-        check <- checklist[i, col_check]
-        if (is.na(check)) next
-        for (specie in species_list[, col_species]) {
-          if (tolower(gsub(" ", "", specie)) == tolower(gsub(" ", "", check))) {
-            compared <- c(compared, specie)
-          }
-        }
-      }
-    }
+    overlap <- sum(unique(tolower(gsub(" ", "", ref_list[, col_check]))) %in% unique(tolower(gsub(" ", "", obs_list[, col_species]))), na.rm = TRUE)
+
+
+    # for (i in seq_len(nrow(checklist))) {
+    #   if (checklist[i, "taxonRank"] %in% c('SPECIES', 'VARIETY')) {
+    #     check <- checklist[i, col_check]
+    #     if (is.na(check)) next
+    #     for (specie in species_list[, col_species]) {
+    #       if (tolower(gsub(" ", "", specie)) == tolower(gsub(" ", "", check))) {
+    #         compared <- c(compared, specie)
+    #       }
+    #     }
+    #   }
+    # }
   } else {
-    for (specie in species_list[, col_species]) {
-      for (check in checklist[, col_check]) {
-        if (tolower(gsub(" ", "", specie)) == tolower(gsub(" ", "", check))) {
-          compared <- c(compared, specie)
-        }
-      }
-    }
+    overlap <- sum(unique(tolower(gsub(" ", "", ref_list[, col_check]))) %in% unique(tolower(gsub(" ", "", obs_list[, col_species]))), na.rm = TRUE)
   }
 
-  return(unique(compared))
+
+  return(overlap)
 }
 
 remove_duplicates <- function(duped_list) {

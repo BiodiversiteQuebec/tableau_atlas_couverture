@@ -1,38 +1,43 @@
 ###############################################################################
-# Compute toxonomic cover of Atlas
+# Function to compute toxonomic cover of Atlas
+#
+# Input:
+#   species_list: List of species names
 #
 # 2023-08-30
 # Victor Cameron
 ###############################################################################
 
-source("src/compareCSVs.r")
-source("src/cover_taxonomic_metadata.r")
+cover_taxonomy <- function(species_list, col_species) {
+    source("src/compareCSVs.r")
+    source("src/cover_taxonomic_metadata.r")
 
-# Arguments
-species <- cover_taxonomic_metadata(species_list="data/api_taxa_names.csv",
-                                    col_species="valid_scientific_name")
+    # Arguments
+    checklists <- cover_taxonomic_metadata(species_list, col_species)
 
-# Compute cover
-cover <- list()
-for (i in 1:nrow(species)) {
-    atlas <- compare_taxa_check(species_list=species$species_list[i][[1]],
-                                checklist=species$checklist[i][[1]],
-                                col_species=species$col_species[i][[1]],
-                                col_check=species$col_check[i][[1]],
-                                source=species$source[i][[1]])
-    
-    checklist <- read.csv(species$checklist[i][[1]])[,species$col_check[i][[1]]] |>
-        remove_duplicates()
+    # Compute cover
+    cover <- list()
+    for (i in 1:nrow(checklists)) {
+        atlas <- compare_taxa_check(species_list=checklists$species_list[i][[1]],
+                                    checklist=checklists$checklist[i][[1]],
+                                    col_species=checklists$col_species[i][[1]],
+                                    col_check=checklists$col_check[i][[1]],
+                                    source=checklists$source[i][[1]])
+        
+        ref_list <- read.csv(checklists$checklist[i][[1]])[,checklists$col_check[i][[1]]] |>
+            remove_duplicates()
 
-    metrics <- show_coverture(length(atlas), length(checklist))
+        metrics <- show_coverture(atlas, length(ref_list))
 
-    cover[[i]] <- metrics
+        cover[[i]] <- metrics
+    }
+
+    cover <- do.call(rbind, cover) |> as.data.frame()
+    cover$taxa <- checklists$taxa
+    order_vec <- order(cover$cover, decreasing = TRUE)
+    cover <- cover[order_vec,]
+
+    # Save results
+    saveRDS(cover, "results/cover.rds")
+    return(cover)
 }
-
-cover <- do.call(rbind, cover) |> as.data.frame()
-cover$taxa <- species$taxa
-order_vec <- order(cover$cover, decreasing = TRUE)
-cover <- cover[order_vec,]
-
-# Save results
-saveRDS(cover, "results/cover.rds")

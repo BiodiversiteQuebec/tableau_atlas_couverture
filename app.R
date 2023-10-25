@@ -191,9 +191,9 @@ server <- function(input, output, session) {
         value = c(nrow(datasets),
             sum(datasets$open_data[datasets$open_data], na.rm = TRUE), 
             sum(datasets$exhaustive[datasets$exhaustive], na.rm = TRUE), 
-            sum(datasets$direct_obs[datasets$direct_obs], na.rm = TRUE)),
-        labels = (paste0(floor(datasets_dat$value/datasets_dat$value[1]*100), "%"))
+            sum(datasets$direct_obs[datasets$direct_obs], na.rm = TRUE))
     )
+    datasets_dat$labels = (paste0(floor(datasets_dat$value/datasets_dat$value[1]*100), "%"))
     # 2. RENDER PLOT
     output$cover_datasets <- renderPlot({
         bp <- barplot(datasets_dat$value, names.arg = datasets_dat$variable, col = "lightblue", border = "black", main = "Couverture des jeux de données", xlab = "Type de données", ylab = "Nombre de jeux de données", ylim = c(0, nrow(datasets)*1.1))

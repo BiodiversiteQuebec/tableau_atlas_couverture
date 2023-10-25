@@ -38,6 +38,6 @@ cover_taxonomy <- function(species_list, col_species) {
     cover <- cover[order_vec,]
 
     # Save results
-    saveRDS(cover, "results/cover.rds")
+    # saveRDS(cover, "results/cover.rds")
     return(cover)
 }

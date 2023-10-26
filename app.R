@@ -361,7 +361,8 @@ server <- function(input, output, session) {
     # Figure: Time series temporal coverage ------------------------------------
     # 1. REQUEST: Get the spatial cover
     spatial_cover_ts <- time_series |>
-        group_by(geometry) |> 
+        mutate(group = st_as_text(geometry)) |>
+        group_by(group) |> 
         summarise(ts_count=n(), 
         taxa_count=n_distinct(id_taxa_obs), 
         within_qc=first(within_qc)) |> 

@@ -5,7 +5,7 @@
 #-- Victor Cameron
 #-------------------------------------------------------------------------------
 get_spatial_counts <- function() {
-  obs_count_req <- get_gen("rpc/obs_map", .schema="atlas_api", 
+  obs_count_req <- db_call_function("rpc/obs_map", schema="atlas_api", 
     region_type = "hex",
     zoom = 5, # 100km hex
     x_min = -106.47949218750001,

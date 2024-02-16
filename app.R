@@ -130,7 +130,7 @@ server <- function(input, output, session) {
 
     # Figure: Taxonomic coverage ------------------------------------------------
     # 1. REQUEST: Get the list of species and synonyms
-    taxa_ref <- get_gen("taxa_ref", select=c("scientific_name", "id", "rank")) # get_gen has fewer bugs...
+    taxa_ref <- db_read_table("taxa_ref", select=c("scientific_name", "id", "rank")) # get_gen has fewer bugs...
     species_list <- data.frame(scientific_name = unique(taxa_ref$scientific_name))
     write.csv(species_list, "data/species_list.csv", row.names = FALSE)
     rm(species_list)
@@ -167,9 +167,9 @@ server <- function(input, output, session) {
 
 
     # Diagnoses ------------------------------------------------
-    obs_summary <- get_function_data("obs_summary", schema="atlas_api", min_year = 1950, max_year = 2020, region_type = "hex", taxa_group_key =19)
+    obs_summary <- db_call_function("obs_summary", schema="atlas_api", min_year = 1950, max_year = 2020, region_type = "hex", taxa_group_key =19)
     obs_count <- obs_summary$obs_count
-    obs_summary_qc <- get_function_data("obs_summary", schema="atlas_api", min_year = 1950, max_year = 2020, region_type = "hex", taxa_group_key = 20)
+    obs_summary_qc <- db_call_function("obs_summary", schema="atlas_api", min_year = 1950, max_year = 2020, region_type = "hex", taxa_group_key = 20)
     obs_count_qc <- obs_summary_qc$obs_count
     taxa_count_qc <- obs_summary_qc$taxa_count
     output$occ_diagnoses_1 <- renderPrint({
@@ -185,7 +185,7 @@ server <- function(input, output, session) {
 
     # Figure: Datasets coverage -----------------------------------------------
     # 1. REQUEST: Get the list of datasets
-    datasets <- get_gen("datasets", select = c("id", "open_data", "exhaustive", "direct_obs"))
+    datasets <- db_read_table("datasets", select = c("id", "open_data", "exhaustive", "direct_obs"))
     datasets_dat <- data.frame(
         variable = c("Total", "Ouverts", "Exhaustifs", "Observations directes"),
         value = c(nrow(datasets),
@@ -230,8 +230,8 @@ server <- function(input, output, session) {
 
     # Figure: Temporal coverage ------------------------------------------------
     # 1. REQUEST: Get the year counts
-    year_counts_qc <- get_gen("rpc/get_year_counts", .schema="atlas_api", taxagroupkey=20) # group20 = Qc
-    year_counts <- get_gen("rpc/get_year_counts", .schema="atlas_api", taxagroupkey=19) # group19 = all species
+    year_counts_qc <- db_call_function("rpc/get_year_counts", schema="atlas_api", taxagroupkey=20) # group20 = Qc
+    year_counts <- db_call_function("rpc/get_year_counts", schema="atlas_api", taxagroupkey=19) # group19 = all species
     ## Add a column to year_counts for the accumulated_count
     year_counts_qc$accumulated_count <- cumsum(year_counts_qc$count_obs)
     year_counts_qc$accumulated_species <- cumsum(year_counts_qc$count_species)
@@ -317,7 +317,7 @@ server <- function(input, output, session) {
 
     # Figure: Time series coverage ------------------------------------------------
     # 1. REQUEST: Get the scientific_names from time_series
-    time_series <- get_table_data("time_series", output_geometry = TRUE)
+    time_series <- db_read_table("time_series", output_geometry = TRUE)
     source("src/get_time-series_taxa_names.r")
     taxa_ts <- get_time_series_taxa_names(time_series, taxa_ref)
 

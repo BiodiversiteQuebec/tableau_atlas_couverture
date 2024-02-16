@@ -8,7 +8,7 @@ get_time_series_taxa_names <- function(ts, taxa_ref) {
     for (i in 1:ceiling(length(unique(ts$id_taxa_obs))/200)) {
         ids <- unique(ts$id_taxa_obs)[((i-1)*200+1):min(i*200, length(unique(ts$id_taxa_obs)))]
         # From time_series' id_taxa_obs, get the id_taxa_ref
-        res <- get_table_data("taxa_obs_ref_lookup", id_taxa_obs=ids)
+        res <- db_read_table("taxa_obs_ref_lookup", id_taxa_obs=ids)
         lu <- if (i == 1) res else rbind(lu, res)
     }
     taxa_refs <- unique(lu$id_taxa_ref)

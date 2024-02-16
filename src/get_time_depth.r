@@ -7,7 +7,7 @@
 get_time_depth <- function(polygons) {
 	    for (i in 1:ceiling(nrow(polygons)/200)) {
         print(i)
-        cover_temp <- get_gen("obs_region_counts", .schema="atlas_api", type="hex", scale=100, select="fid, type, year_obs", fid=polygons$fid[((i-1)*200+1):min(i*200, nrow(polygons))]) |>
+        cover_temp <- db_read_table("obs_region_counts", schema="atlas_api", type="hex", scale=100, select="fid, type, year_obs", fid=polygons$fid[((i-1)*200+1):min(i*200, nrow(polygons))]) |>
             # group by fid, type
             group_by(fid, type) |>
             # get min and max year_obs

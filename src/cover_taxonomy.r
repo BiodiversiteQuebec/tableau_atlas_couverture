@@ -10,7 +10,7 @@ cover_taxonomic_metadata <- function(species_list, col_species){
     as.data.frame(do.call(rbind, list(
         list(
             taxa="Araignées",
-            taxa_name = "Araignées",
+            taxa_name = "Arachnida",
             species_list=species_list,
             checklist="data/checklist_araignées.csv",
             col_species=col_species,

@@ -145,7 +145,7 @@ server <- function(input, output, session) {
             col="lightblue", 
             main="Couverture des listes de références", 
             ylab="Couverture (%)", 
-            ylim=c(0,100),
+            ylim=c(0,105),
             las = 2 # Rotate labels by 90 degrees
         )
 
